@@ -1,18 +1,356 @@
 ---
-title: "R Notebook"
-output: html_notebook
+title: "LABORATORIO --JOSE RICARDO MERIDA"
+
+output:
+  pdf_document: default
+  html_notebook: default
 ---
-
-This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
-
-Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
-
 ```{r}
-plot(cars)
+library(dplyr)
+library(ggplot2)
+library(nycflights13)
 ```
 
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
 
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
 
-The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+```{r}
+mis_datos <- read.csv("dataset.csv")
+
+data_frame_datos <- data.frame(mis_datos)
+
+#print(data_frame_datos)
+
+library(dplyr)
+
+
+```
+
+## -----------------------   PREGUNTA 1 ----------------------------
+## Cree un conjunto de columnas nuvas: día, mes, año, hora y minutos
+## a partir de la comlumna datetime, para esto investigue como puede
+## “desarmar” la variable datetime utilizando lubridate y mutate.
+
+## -------------- RESPUESTA 1 --------------------------------
+
+## no existe la columna datatime
+
+```{r}
+grupos14<-tidyr::separate(data_frame_datos, dteday, c("y", "m", "d"))
+
+str(grupos14)
+```
+
+
+
+## -------------- PREGUNTA 2 --------------------------------
+
+## ¿Qué mes es el que tiene la mayor demanda? Muestre una tabla y una
+## gráfica
+
+## -------------- RESPUESTA 2 --------------------------------
+```{r}
+grupos <- data_frame_datos %>%
+  group_by(mnth)%>%
+  summarise(cnt = n())
+  
+print(grupos)
+
+qplot(x=mnth,y=cnt,data=grupos,geom='line')
+
+p2<-ggplot(data=grupos, aes(x=mnth, y=cnt)) +
+  geom_bar(stat="identity")
+
+p2
+
+top1 <- grupos %>%
+  top_n(1,cnt)
+
+print("Los meses que tienen mayor demanda son")
+print(top1)
+
+
+
+
+```
+
+## -------------- PREGUNTA 3 --------------------------------
+
+## ¿Qué rango de hora es la de mayor demanda? Muestre una tabla y una
+## gráfica
+
+## -------------- RESPUESTA 3 --------------------------------
+
+```{r}
+grupos3 <- data_frame_datos %>%
+  group_by(hr)%>%
+  summarise(cnt = n())
+
+print(grupos3)
+
+qplot(x=hr,y=cnt,data=grupos3,geom='line')
+
+p3<-ggplot(data=grupos3, aes(x=hr, y=cnt)) +
+  geom_bar(stat="identity")
+
+p3
+
+top3 <- grupos3 %>%
+  top_n(1,cnt)
+
+print(top3)
+```
+
+## -------------- PREGUNTA 4 --------------------------------
+
+## ¿Qué temporada es la mas alta? Muestre una tabla.
+
+## -------------- RESPUESTA 4 --------------------------------
+
+```{r}
+grupos4 <- data_frame_datos %>%
+  group_by(season)%>%
+  summarise(cnt = n())
+
+print(grupos4)
+
+qplot(x=season,y=cnt,data=grupos4,geom='line')
+
+p4<-ggplot(data=grupos4, aes(x=season, y=cnt)) +
+  geom_bar(stat="identity")
+
+p4
+
+top4 <- grupos4 %>%
+  top_n(1,cnt)
+
+print(top4)
+```
+
+
+## -------------- PREGUNTA 5 --------------------------------
+
+## ¿A que temperatura disminuye la demanda? Muestre una gráfica para
+## analizar y dar su respuesta.
+
+## -------------- RESPUESTA 5 --------------------------------
+
+```{r}
+grupos5 <- data_frame_datos %>%
+  group_by(temp)%>%
+  summarise(cnt = n())
+
+print(grupos5)
+
+qplot(x=temp,y=cnt,data=grupos5,geom='line')
+
+p5<-ggplot(data=grupos5, aes(x=temp, y=cnt)) +
+  geom_bar(stat="identity")
+
+p5
+
+top5 <- grupos5 %>%
+  top_n(1,-cnt)
+
+print(top5)
+
+```
+
+## -------------- PREGUNTA 6 --------------------------------
+
+## ¿A que humedad disminuye la demanda? Muestre una gráfica para
+## analizar y dar su respuesta.
+
+## -------------- RESPUESTA 6 --------------------------------
+```{r}
+grupos6 <- data_frame_datos %>%
+  group_by(hum)%>%
+  summarise(cnt = n())
+
+print(grupos6)
+
+qplot(x=hum,y=cnt,data=grupos6,geom='line')
+
+p6<-ggplot(data=grupos6, aes(x=hum, y=cnt)) +
+  geom_bar(stat="identity")
+
+p6
+
+top6 <- grupos6 %>%
+  top_n(1,-cnt)
+
+print(top6)
+```
+
+## -------------- PREGUNTA 7 --------------------------------
+
+## ¿Que condiciones climáticas serian ideales para nuestra demanda?
+## (considere una función de densidad bivariable para la temperatura
+## y la humedad)
+
+## -------------- RESPUESTA 7 --------------------------------
+```{r}
+grupos7 <- data_frame_datos %>%
+  group_by(hum,temp)%>%
+  summarise(cant_1 = n())
+
+print(grupos7)
+
+top7 <- grupos7 %>%
+  arrange(desc(cant_1))
+  
+
+print(top7)
+```
+## -------------- PREGUNTA 8 --------------------------------
+
+##  Mueste una gráfica de la densidad de rentas.
+
+## -------------- RESPUESTA 8 --------------------------------
+
+```{r}
+ggplot(data_frame_datos, aes(x = cnt)) +
+  geom_density(color = 4,    # Color
+               lwd = 1,      # Ancho
+               linetype = 1) # Tipo
+```
+
+## -------------- PREGUNTA 9 --------------------------------
+
+## ¿En promedio de personas que rentan bicicletas y están
+## registradas?
+
+## -------------- RESPUESTA 9 --------------------------------
+
+```{r}
+promedio_p9 <- mean(data_frame_datos$registered)
+promedio_p9 <- round(promedio_p9,0)
+promedio_p9
+```
+## -------------- PREGUNTA 10 --------------------------------
+
+##  Determine la mediana de personas que rentan bicicletas y no están
+##  registradas.
+
+## -------------- RESPUESTA 10 --------------------------------
+
+```{r}
+promedio_p10 <- mean(data_frame_datos$casual)
+promedio_p10 <- round(promedio_p10,0)
+promedio_p10
+```
+## -------------- PREGUNTA 11 --------------------------------
+
+##  Deterimne la renta total, renta promedio por cada tipo de
+##  estación.
+
+## -------------- RESPUESTA 11 --------------------------------
+```{r}
+grupos11 <- data_frame_datos %>%
+  group_by(season)%>%
+  summarise(cnt = n())
+
+print(grupos11)
+
+top11 <- grupos11 %>%
+  arrange(desc(cnt))
+print("Renta total por estación")
+print(top11)
+
+grupos11_1 <- data_frame_datos %>%
+  group_by(season)%>%
+  summarise(promedio_season=mean(cnt))
+
+grupos11_1
+
+```
+## -------------- PREGUNTA 12 --------------------------------
+
+##  Determine y muestre una gráfica de barras la cantidad de rentas
+##  por tipo de temporada.
+
+## -------------- RESPUESTA 12 --------------------------------
+
+```{r}
+p12<-ggplot(data=grupos11, aes(x=season, y=cnt)) +
+  geom_bar(stat="identity")
+
+p12
+```
+## -------------- PREGUNTA 13 --------------------------------
+
+##   Muestre una gráfica de la densidad por hora.
+
+## -------------- RESPUESTA 13 --------------------------------
+```{r}
+ggplot(data_frame_datos, aes(x = hr)) +
+  geom_density(color = 4,    # Color
+               lwd = 1,      # Ancho
+               linetype = 1) # Tipo
+```
+## -------------- PREGUNTA 14 --------------------------------
+
+##   Muestre una gráfica de barras por día del mes como eje x y la
+##   cantidad total de alquileres como el eje Y.
+
+## -------------- RESPUESTA 14 --------------------------------
+
+```{r}
+
+grupos14<-tidyr::separate(data_frame_datos, dteday, c("y", "m", "d"))
+
+str(grupos14)
+
+grupos14 <- grupos14 %>%
+  group_by(d)%>%
+  summarise(cnt = n())
+
+p12<-ggplot(data=grupos14, aes(x=d, y=cnt)) +
+  geom_bar(stat="identity")
+
+p12
+
+```
+## -------------- PREGUNTA 15 --------------------------------
+
+##   Muestre una serie temporal (gráfica) con el tiempo (mes-dia-año)
+##   como eje de tiempo y la cantidad de alquieleres como eje Y.
+
+## -------------- RESPUESTA 15 --------------------------------
+
+```{r}
+library(tidyverse)
+
+grupos15<-tidyr::separate(data_frame_datos, dteday, c("y", "m", "d"))
+
+grupos15 <- grupos15 %>%
+  group_by(y,m)%>%
+  summarise(cnt = n())
+
+grupos15 $ date <- paste (grupos15$y, grupos15$m, sep = "-")
+
+grupos15 <- grupos15 %>%
+  select(date,cnt)
+
+grupos15
+
+qplot(x=date,y=cnt,data=grupos15,geom='point')+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+```
+## -------------- PREGUNTA 16 --------------------------------
+
+##  Muestre una gráfica de puntos que relaciones la temperatura como
+##  ejer X y la humedad como eje Y.
+
+## -------------- RESPUESTA 16 --------------------------------
+```{r}
+
+
+grupos16 <- data_frame_datos %>%
+  select(hum,temp)
+
+qplot(x=temp,y=hum,data=grupos16,geom='point')+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+```
+
